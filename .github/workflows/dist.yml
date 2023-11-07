@@ -110,6 +110,7 @@ jobs:
         RPYBUILD_STRIP_LIBPYTHON: "1"
         MACOSX_DEPLOYMENT_TARGET: "11.7"
         RPYBUILD_CC_LAUNCHER: "sccache"
+        SCCACHE_CACHE_MULTIARCH: "true"
         SCCACHE_GHA_ENABLED: "true"
 
     - uses: actions/upload-artifact@v3
