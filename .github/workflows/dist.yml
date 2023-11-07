@@ -6,6 +6,7 @@ on:
   push:
     branches:
     - main
+    - try
     tags:
     - '*'
 
@@ -87,27 +88,7 @@ jobs:
     # Setup build caching
     #
 
-    - name: Set ccache variant
-      shell: bash
-      id: ccache
-      run: |
-        if [[ "${{ runner.os }}" == "Windows" ]]; then
-          echo "VARIANT=sccache" >> $GITHUB_OUTPUT
-          echo "RPYBUILD_CC_LAUNCHER=sccache" >> $GITHUB_ENV
-        else
-          echo "VARIANT=ccache" >> $GITHUB_OUTPUT
-          echo "RPYBUILD_CC_LAUNCHER=ccache" >> $GITHUB_ENV
-        fi
-
-    - name: Setup ccache
-      if: steps.ccache.outputs.variant == 'ccache'
-      uses: hendrikmuhs/ccache-action@v1.2.10
-      with:
-          key: ${{ matrix.os }}-${{ matrix.python_version }}
-          variant: ccache
-
     - name: Setup sccache
-      if: steps.ccache.outputs.variant == 'sccache'
       uses: mozilla-actions/sccache-action@v0.0.3
 
     - name: Install deps
@@ -128,6 +109,7 @@ jobs:
         RPYBUILD_PARALLEL: "1"
         RPYBUILD_STRIP_LIBPYTHON: "1"
         MACOSX_DEPLOYMENT_TARGET: "11.7"
+        RPYBUILD_CC_LAUNCHER: "sccache"
         SCCACHE_GHA_ENABLED: "true"
 
     - uses: actions/upload-artifact@v3
@@ -179,17 +161,10 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Set ccache env
-      shell: bash
-      run: |
-        echo "RPYBUILD_CC_LAUNCHER=ccache" >> $GITHUB_ENV
-
     - run: apt-get update
-    - name: Setup ccache
-      uses: hendrikmuhs/ccache-action@v1.2
-      with:
-          key: ${{ matrix.os.container }}
-          variant: ccache
+
+    - name: Setup sccache
+      uses: mozilla-actions/sccache-action@v0.0.3
 
     - name: Install setuptools + wheel
       run: |
@@ -217,6 +192,7 @@ jobs:
       env:
         RPYBUILD_PARALLEL: "1"
         RPYBUILD_STRIP_LIBPYTHON: "1"
+        RPYBUILD_CC_LAUNCHER: "sccache"
       
     - uses: actions/upload-artifact@v3
       with:
