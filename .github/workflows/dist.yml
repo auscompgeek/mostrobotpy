@@ -72,7 +72,8 @@ jobs:
       max-parallel: ${{ fromJSON(needs.setup_concurrency.outputs.max-parallel).v }}
       fail-fast: true
       matrix:
-        os: ["ubuntu-22.04", "macos-13", "windows-2022"]
+        # os: ["ubuntu-22.04", "macos-13", "windows-2022"]
+        os: ["macos-13"]
         python_version:
         - '3.9'
         - '3.10'
@@ -102,14 +103,6 @@ jobs:
           echo "VARIANT=ccache" >> $GITHUB_OUTPUT
           echo "MAX_SIZE=500M" >> $GITHUB_OUTPUT
         fi
-
-    - name: Setup ccache
-      if: steps.ccache.outputs.variant == 'ccache'
-      uses: hendrikmuhs/ccache-action@v1.2
-      with:
-          key: ${{ matrix.os }}-${{ matrix.python_version }}
-          variant: ccache
-          max-size: ${{ steps.ccache.outputs.max_size }}
 
     - name: Setup sccache
       if: steps.ccache.outputs.variant == 'sccache'
@@ -145,6 +138,7 @@ jobs:
   #
 
   cross-build:
+    if: false
     runs-on: ubuntu-latest
     needs: [setup_concurrency]
     strategy:
