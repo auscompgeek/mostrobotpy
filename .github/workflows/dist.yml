@@ -124,7 +124,7 @@ jobs:
         ./rdev.sh ci run
       env:
         RPYBUILD_STRIP_LIBPYTHON: "1"
-        RPYBUILD_CC_LAUNCHER: ${{ steps.ccache.outputs.variant }}
+        # RPYBUILD_CC_LAUNCHER: ${{ steps.ccache.outputs.variant }}
         SCCACHE_WEBDAV_USERNAME: ${{ secrets.WPI_ARTIFACTORY_USERNAME }}
         SCCACHE_WEBDAV_PASSWORD: ${{ secrets.WPI_ARTIFACTORY_TOKEN }}
 
