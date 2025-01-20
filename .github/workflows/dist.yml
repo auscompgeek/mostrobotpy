@@ -104,6 +104,14 @@ jobs:
           echo "MAX_SIZE=500M" >> $GITHUB_OUTPUT
         fi
 
+    - name: Setup ccache
+      if: steps.ccache.outputs.variant == 'ccache'
+      uses: hendrikmuhs/ccache-action@v1.2
+      with:
+          key: ${{ matrix.os }}-${{ matrix.python_version }}
+          variant: ccache
+          max-size: ${{ steps.ccache.outputs.max_size }}
+
     - name: Setup sccache
       if: steps.ccache.outputs.variant == 'sccache'
       uses: mozilla-actions/sccache-action@v0.0.7
@@ -124,7 +132,7 @@ jobs:
         ./rdev.sh ci run
       env:
         RPYBUILD_STRIP_LIBPYTHON: "1"
-        # RPYBUILD_CC_LAUNCHER: ${{ steps.ccache.outputs.variant }}
+        RPYBUILD_CC_LAUNCHER: ${{ steps.ccache.outputs.variant }}
         SCCACHE_WEBDAV_USERNAME: ${{ secrets.WPI_ARTIFACTORY_USERNAME }}
         SCCACHE_WEBDAV_PASSWORD: ${{ secrets.WPI_ARTIFACTORY_TOKEN }}
 
