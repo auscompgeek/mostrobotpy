@@ -161,13 +161,6 @@ jobs:
         - container: wpilib/raspbian-cross-ubuntu:2025-bookworm-22.04-py313
           name: raspbian-py313
 
-        - container: wpilib/aarch64-cross-ubuntu:2025-bookworm-22.04-py311
-          name: raspbian-aarch64-py311
-        - container: wpilib/aarch64-cross-ubuntu:2025-bookworm-22.04-py312
-          name: raspbian-aarch64-py312
-        - container: wpilib/aarch64-cross-ubuntu:2025-bookworm-22.04-py313
-          name: raspbian-aarch64-py313
-
     container:
       image: "${{ matrix.os.container }}"
 
@@ -224,6 +217,54 @@ jobs:
   #
   # Publish wheels to wpilib artifactory, pypi
   #
+
+  build-arm:
+    runs-on: ubuntu-24.04-arm
+    needs: [setup_concurrency]
+    strategy:
+      matrix:
+        python_version:
+        - '3.11'
+        - '3.12'
+        - '3.13'
+    container: python:${{ matrix.python_version }}-bookworm
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    #
+    # Setup build caching
+    #
+
+    - name: Setup sccache
+      uses: mozilla-actions/sccache-action@v0.0.7
+
+    - name: Install deps
+      shell: bash
+      run: |
+        python -m pip --disable-pip-version-check install -r rdev_requirements.txt
+
+    - name: Install numpy (needed for stubgen)
+      shell: bash
+      run: |
+        python -m pip --disable-pip-version-check install numpy
+
+    - name: Build + test wheels
+      shell: bash
+      run: |
+        ./rdev.sh ci run
+      env:
+        RPYBUILD_STRIP_LIBPYTHON: "1"
+        RPYBUILD_CC_LAUNCHER: sccache
+        SCCACHE_WEBDAV_USERNAME: ${{ secrets.WPI_ARTIFACTORY_USERNAME }}
+        SCCACHE_WEBDAV_PASSWORD: ${{ secrets.WPI_ARTIFACTORY_TOKEN }}
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: "pypi-${{ runner.os }}-arm-${{ matrix.python_version }}"
+        path: dist
 
   publish-rpyrepo:
     runs-on: ubuntu-latest
