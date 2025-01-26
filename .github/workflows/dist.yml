@@ -240,8 +240,11 @@ jobs:
     # Setup build caching
     #
 
-    - name: Setup sccache
-      uses: mozilla-actions/sccache-action@v0.0.7
+    - name: Setup ccache
+      uses: hendrikmuhs/ccache-action@v1.2
+      with:
+          key: ${{ matrix.os.container }}
+          variant: ccache
 
     - name: Install deps
       shell: bash
@@ -259,7 +262,7 @@ jobs:
         ./rdev.sh ci run
       env:
         RPYBUILD_STRIP_LIBPYTHON: "1"
-        RPYBUILD_CC_LAUNCHER: sccache
+        RPYBUILD_CC_LAUNCHER: ccache
         SCCACHE_WEBDAV_USERNAME: ${{ secrets.WPI_ARTIFACTORY_USERNAME }}
         SCCACHE_WEBDAV_PASSWORD: ${{ secrets.WPI_ARTIFACTORY_TOKEN }}
 
