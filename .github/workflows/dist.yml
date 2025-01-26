@@ -240,6 +240,7 @@ jobs:
     # Setup build caching
     #
 
+    - run: apt-get update
     - name: Setup ccache
       uses: hendrikmuhs/ccache-action@v1.2
       with:
