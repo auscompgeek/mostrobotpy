@@ -240,7 +240,7 @@ jobs:
     # Setup build caching
     #
 
-    - run: apt-get update
+    - run: apt-get update && apt-get install --no-install-recommends git
     - name: Setup ccache
       uses: hendrikmuhs/ccache-action@v1.2
       with:
