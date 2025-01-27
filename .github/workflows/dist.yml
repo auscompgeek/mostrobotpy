@@ -232,6 +232,8 @@ jobs:
     container: python:${{ matrix.python_version }}-bookworm
 
     steps:
+    - run: apt-get update && apt-get install -y libgl1
+
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
@@ -240,7 +242,6 @@ jobs:
     # Setup build caching
     #
 
-    - run: apt-get update
     - name: Setup ccache
       uses: hendrikmuhs/ccache-action@v1.2
       with:
