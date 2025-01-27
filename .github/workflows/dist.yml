@@ -240,12 +240,18 @@ jobs:
     # Setup build caching
     #
 
-    - run: apt-get update && apt-get install --no-install-recommends git
+    - run: apt-get update
     - name: Setup ccache
       uses: hendrikmuhs/ccache-action@v1.2
       with:
           key: ${{ matrix.os.container }}
           variant: ccache
+
+    # See https://github.com/pypa/setuptools_scm/issues/784
+    - name: Set git directory as safe to allow setuptools-scm to work
+      shell: bash
+      run: |
+        /usr/bin/git config --global --add safe.directory $PWD
 
     - name: Install deps
       shell: bash
